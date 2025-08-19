@@ -1,4 +1,4 @@
-package blogaggregator
+package main
 
 import (
 	"fmt"
@@ -6,13 +6,16 @@ import (
 	"github.com/Giira/blogaggregator/internal/config"
 )
 
-func main() error {
+func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		return err
+		fmt.Printf("Error: %v", err)
 	}
 	cfg.SetUser("Euan")
-	config.Read()
+	fmt.Print(cfg.Current_user_name)
+	cfg, err = config.Read()
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+	}
 	fmt.Printf("Current user: %s\nConfig database url: %s\n", cfg.Current_user_name, cfg.Db_url)
-	return nil
 }

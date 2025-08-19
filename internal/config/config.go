@@ -14,6 +14,7 @@ type Config struct {
 
 func (cfg Config) SetUser(user string) {
 	cfg.Current_user_name = user
+
 }
 
 func Read() (Config, error) {
@@ -21,12 +22,17 @@ func Read() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	address = address + configFileName
+	address = address + "/" + configFileName
 
-	cfg := Config{}
-	err = json.Unmarshal(address, &cfg)
+	data, err := os.ReadFile(address)
 	if err != nil {
 		return Config{}, err
 	}
-	return
+
+	cfg := Config{}
+	err = json.Unmarshal(data, &cfg)
+	if err != nil {
+		return Config{}, err
+	}
+	return cfg, nil
 }
