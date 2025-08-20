@@ -12,7 +12,6 @@ func main() {
 		fmt.Printf("Error: %v", err)
 	}
 	cfg.SetUser("Euan")
-	fmt.Print(cfg.Current_user_name)
 	cfg, err = config.Read()
 	if err != nil {
 		fmt.Printf("Error: %v", err)

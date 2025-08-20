@@ -14,7 +14,24 @@ type Config struct {
 
 func (cfg Config) SetUser(user string) {
 	cfg.Current_user_name = user
+	cfg.Write()
+}
 
+func (cfg Config) Write() error {
+	address, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	address = address + "/" + configFileName
+	jsonData, err := json.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(address, jsonData, 0666)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func Read() (Config, error) {
