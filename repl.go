@@ -19,6 +19,19 @@ type command struct {
 	arguments []string
 }
 
+type commands struct {
+	commands map[string]func(*state, command) error
+}
+
+func (c *commands) run(s *state, cmd command) error {
+	// run command
+	return nil
+}
+
+func (c *commands) register(name string, f func(*state, command) error) {
+	// register handler function
+}
+
 func cleanInput(text string) []string {
 	var output []string
 	text = strings.ToLower(text)

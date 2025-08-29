@@ -13,4 +13,7 @@ func main() {
 	}
 	s := state{}
 	s.cfg = &cfg
+
+	commands := commands{}
+
 }
