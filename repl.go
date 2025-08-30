@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
-	"os"
-	"strings"
 
 	"github.com/Giira/blogaggregator/internal/config"
 )
@@ -24,37 +21,26 @@ type commands struct {
 }
 
 func (c *commands) run(s *state, cmd command) error {
-	// run command
-	return nil
+	f, ok := c.commands[cmd.name]
+	if !ok {
+		return errors.New("error: no such function")
+	}
+	return f(s, cmd)
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
-	// register handler function
-}
-
-func cleanInput(text string) []string {
-	var output []string
-	text = strings.ToLower(text)
-	output = strings.Fields(text)
-	return output
+	c.commands[name] = f
 }
 
 func handlerLogin(s *state, cmd command) error {
-	scanner := bufio.NewScanner(os.Stdin)
-	for {
-		fmt.Print("Gator > ")
-		boo := scanner.Scan()
-
-		if !boo {
-			return errors.New("Error: Input required")
-		} else {
-			input := scanner.Text()
-			i_slice := cleanInput(input)
-
-			switch i_slice[0] {
-			case "login":
-
-			}
-		}
+	if len(cmd.arguments) != 1 {
+		return errors.New("error: login function requires a single word username")
 	}
+	name := cmd.arguments[0]
+	err := s.cfg.SetUser(name)
+	if err != nil {
+		return fmt.Errorf("error: username could not be set - %v", err)
+	}
+	fmt.Printf("Username set to: %s\n", s.cfg.Current_user_name)
+	return nil
 }
