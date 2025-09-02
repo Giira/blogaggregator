@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	"github.com/Giira/blogaggregator/internal/config"
+	"github.com/Giira/blogaggregator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -14,6 +17,13 @@ func main() {
 	}
 	s := state{}
 	s.cfg = &cfg
+
+	db, err := sql.Open("postgres", s.cfg.Db_url)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+	}
+	dbQueries := database.New(db)
+	s.db = dbQueries
 
 	commands := commands{
 		commands: make(map[string]func(*state, command) error),

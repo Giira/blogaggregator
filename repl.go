@@ -5,9 +5,11 @@ import (
 	"fmt"
 
 	"github.com/Giira/blogaggregator/internal/config"
+	"github.com/Giira/blogaggregator/internal/database"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 
