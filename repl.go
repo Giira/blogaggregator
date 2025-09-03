@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/Giira/blogaggregator/internal/config"
 	"github.com/Giira/blogaggregator/internal/database"
+	"github.com/google/uuid"
 )
 
 type state struct {
@@ -44,5 +48,28 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("error: username could not be set - %v", err)
 	}
 	fmt.Printf("Username set to: %s\n", s.cfg.Current_user_name)
+	return nil
+}
+
+func handlerRegister(s *state, cmd command) error {
+	if len(cmd.arguments) != 1 {
+		return errors.New("error: register function requires a single word username")
+	}
+	name := cmd.arguments[0]
+	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      name,
+	})
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		os.Exit(1)
+	}
+	err = s.cfg.SetUser(name)
+	if err != nil {
+		return fmt.Errorf("error: username could not be set - %v", err)
+	}
+	fmt.Printf("User created:\nID: %v\nCreatedAt: %v\nUpdatedAt: %v\nName: %s", user.ID, user.CreatedAt, user.UpdatedAt, user.Name)
 	return nil
 }
