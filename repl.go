@@ -70,6 +70,6 @@ func handlerRegister(s *state, cmd command) error {
 	if err != nil {
 		return fmt.Errorf("error: username could not be set - %v", err)
 	}
-	fmt.Printf("User created:\nID: %v\nCreatedAt: %v\nUpdatedAt: %v\nName: %s", user.ID, user.CreatedAt, user.UpdatedAt, user.Name)
+	fmt.Printf("User created:\nID: %v\nCreatedAt: %v\nUpdatedAt: %v\nName: %s\n", user.ID, user.CreatedAt, user.UpdatedAt, user.Name)
 	return nil
 }
