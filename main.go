@@ -13,7 +13,7 @@ import (
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		fmt.Printf("error: %v\n", err)
 	}
 	s := state{}
 	s.cfg = &cfg
@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("error: %v", err)
 	}
+	defer db.Close()
 	dbQueries := database.New(db)
 	s.db = dbQueries
 
@@ -30,6 +31,7 @@ func main() {
 	}
 	commands.register("login", handlerLogin)
 	commands.register("register", handlerRegister)
+	commands.register("reset", handlerReset)
 
 	args := os.Args
 	if len(args) < 2 {

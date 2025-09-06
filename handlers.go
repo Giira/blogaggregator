@@ -7,35 +7,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/Giira/blogaggregator/internal/config"
 	"github.com/Giira/blogaggregator/internal/database"
 	"github.com/google/uuid"
 )
 
-type state struct {
-	db  *database.Queries
-	cfg *config.Config
-}
-
-type command struct {
-	name      string
-	arguments []string
-}
-
-type commands struct {
-	commands map[string]func(*state, command) error
-}
-
-func (c *commands) run(s *state, cmd command) error {
-	f, ok := c.commands[cmd.name]
-	if !ok {
-		return errors.New("error: no such function")
+func handlerReset(s *state, cmd command) error {
+	err := s.db.Reset(context.Background())
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		os.Exit(1)
 	}
-	return f(s, cmd)
-}
-
-func (c *commands) register(name string, f func(*state, command) error) {
-	c.commands[name] = f
+	return nil
 }
 
 func handlerLogin(s *state, cmd command) error {
@@ -43,7 +25,12 @@ func handlerLogin(s *state, cmd command) error {
 		return errors.New("error: login function requires a single word username")
 	}
 	name := cmd.arguments[0]
-	err := s.cfg.SetUser(name)
+	_, err := s.db.GetUser(context.Background(), name)
+	if err != nil {
+		fmt.Printf("error: user '%s' not in table\n", name)
+		os.Exit(1)
+	}
+	err = s.cfg.SetUser(name)
 	if err != nil {
 		return fmt.Errorf("error: username could not be set - %v", err)
 	}
@@ -63,7 +50,7 @@ func handlerRegister(s *state, cmd command) error {
 		Name:      name,
 	})
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		fmt.Printf("error: %v\n", err)
 		os.Exit(1)
 	}
 	err = s.cfg.SetUser(name)

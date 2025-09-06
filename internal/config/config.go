@@ -12,7 +12,7 @@ type Config struct {
 	Current_user_name string `json:"current_user_name"`
 }
 
-func (cfg Config) SetUser(user string) error {
+func (cfg *Config) SetUser(user string) error {
 	cfg.Current_user_name = user
 	err := cfg.Write()
 	if err != nil {
