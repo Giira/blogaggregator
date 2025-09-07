@@ -60,3 +60,18 @@ func handlerRegister(s *state, cmd command) error {
 	fmt.Printf("User created:\nID: %v\nCreatedAt: %v\nUpdatedAt: %v\nName: %s\n", user.ID, user.CreatedAt, user.UpdatedAt, user.Name)
 	return nil
 }
+
+func handlerUsers(s *state, cmd command) error {
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+	for _, user := range users {
+		if user == s.cfg.Current_user_name {
+			user = user + " (current)"
+		}
+		user = "* " + user
+		fmt.Println(user)
+	}
+	return nil
+}
