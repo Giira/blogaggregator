@@ -75,3 +75,23 @@ func handlerUsers(s *state, cmd command) error {
 	}
 	return nil
 }
+
+func handlerAgg(s *state, cmd command) error {
+	feedURL := "https://www.wagslane.dev/index.xml"
+	feed, err := fetchFeed(context.Background(), feedURL)
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+	fmt.Printf("Title: %v\n", feed.Title)
+	fmt.Printf("Link: %v\n", feed.Link)
+	fmt.Printf("Description: %v\n", feed.Description)
+	for i, item := range feed.Item {
+		fmt.Printf("Item %v:\n", i)
+		fmt.Printf("	Title: %v\n", item.Title)
+		fmt.Printf("	Link: %v\n", item.Link)
+		fmt.Printf("	Description: %v\n", item.Description)
+		fmt.Printf("	Publication Date: %v\n", item.PubDate)
+	}
+
+	return nil
+}
