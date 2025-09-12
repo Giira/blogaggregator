@@ -140,3 +140,33 @@ func handlerFeeds(s *state, cmd command) error {
 	}
 	return nil
 }
+
+func handlerFollow(s *state, cmd command) error {
+	if len(cmd.arguments) != 1 {
+		return errors.New("error: follow function requires a single url")
+	}
+
+	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+
+	feed, err := s.db.GetFeed(context.Background(), cmd.arguments[0])
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+
+	feedFollow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+	fmt.Printf("Feed followed:\nFeed: %v\nUser: %v\n", feedFollow.FeedName, feedFollow.UserName)
+
+	return nil
+}
