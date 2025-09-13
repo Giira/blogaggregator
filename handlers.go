@@ -170,3 +170,17 @@ func handlerFollow(s *state, cmd command) error {
 
 	return nil
 }
+
+func handlerFollowing(s *state, cmd command) error {
+	if len(cmd.arguments) != 0 {
+		return errors.New("error: following command takes no arguments")
+	}
+	fffu, err := s.db.GetFeedFollowsForUser(context.Background(), s.cfg.Current_user_name)
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+	for _, user_follows := range fffu {
+		fmt.Printf(user_follows.FeedName)
+	}
+	return nil
+}
