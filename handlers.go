@@ -127,6 +127,15 @@ func handlerAddfeed(s *state, cmd command) error {
 
 	fmt.Printf("Feed created:\nID: %v\nCreated at: %v\nUpdated at: %v\n", feed.ID, feed.CreatedAt, feed.UpdatedAt)
 	fmt.Printf("Feed name: %v\nUrl: %v\nUserID: %v\n", feed.Name, feed.Url, feed.UserID)
+
+	cmdff := command{
+		name:      "follow",
+		arguments: []string{url},
+	}
+	err = handlerFollow(s, cmdff)
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
 	return nil
 }
 
@@ -180,7 +189,7 @@ func handlerFollowing(s *state, cmd command) error {
 		return fmt.Errorf("error: %v", err)
 	}
 	for _, user_follows := range fffu {
-		fmt.Printf(user_follows.FeedName)
+		fmt.Printf("* %v\n", user_follows.FeedName)
 	}
 	return nil
 }
