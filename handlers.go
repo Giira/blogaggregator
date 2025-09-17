@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"log"
 	"os"
 	"time"
 
@@ -101,12 +102,7 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddfeed(s *state, cmd command) error {
-	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("error: %v", err)
-	}
-
+func handlerAddfeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 2 {
 		return errors.New("error: addfeed requires a feed name and a url")
 	}
@@ -132,7 +128,7 @@ func handlerAddfeed(s *state, cmd command) error {
 		name:      "follow",
 		arguments: []string{url},
 	}
-	err = handlerFollow(s, cmdff)
+	err = handlerFollow(s, cmdff, user)
 	if err != nil {
 		return fmt.Errorf("error: %v", err)
 	}
@@ -150,14 +146,9 @@ func handlerFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 1 {
 		return errors.New("error: follow function requires a single url")
-	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
-	if err != nil {
-		return fmt.Errorf("error: %v", err)
 	}
 
 	feed, err := s.db.GetFeed(context.Background(), cmd.arguments[0])
@@ -180,16 +171,40 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowing(s *state, cmd command) error {
+func handlerFollowing(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) != 0 {
 		return errors.New("error: following command takes no arguments")
 	}
-	fffu, err := s.db.GetFeedFollowsForUser(context.Background(), s.cfg.Current_user_name)
+	fffu, err := s.db.GetFeedFollowsForUser(context.Background(), user.Name)
 	if err != nil {
 		return fmt.Errorf("error: %v", err)
 	}
 	for _, user_follows := range fffu {
 		fmt.Printf("* %v\n", user_follows.FeedName)
+	}
+	return nil
+}
+
+func midLoggedIn(handler func(s *state, cmd command, user database.User) error) func(*state, command) error {
+	return func(s *state, cmd command) error {
+		user, err := s.db.GetUser(context.Background(), s.cfg.Current_user_name)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
+		return handler(s, cmd, user)
+	}
+}
+
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+	if len(cmd.arguments) != 1 {
+		return errors.New("error: unfollow command takes a single url")
+	}
+	err := s.db.Unfollow(context.Background(), database.UnfollowParams{
+		Url:  cmd.arguments[0],
+		Name: user.Name,
+	})
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
 	}
 	return nil
 }
