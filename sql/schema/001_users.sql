@@ -24,6 +24,9 @@ CREATE TABLE feed_follows (
     UNIQUE (user_id, feed_id)
 );
 
+ALTER TABLE feeds
+ADD COLUMN last_fetched_at TIMESTAMP;
+
 -- +goose Down
 DROP TABLE feed_follows;
 DROP TABLE feeds;

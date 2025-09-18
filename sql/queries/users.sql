@@ -74,3 +74,11 @@ WHERE users.name = $1;
 DELETE FROM feed_follows USING users, feeds
 WHERE feed_follows.user_id = users.id AND users.name = $2
 AND feed_follows.feed_id = feeds.id AND feeds.url = $1;
+
+-- name: MarkFeedFetched :exec
+UPDATE feeds
+SET
+    last_fetched_at = $1,
+    updated_at = $1
+WHERE 
+    id = $2;
