@@ -260,6 +260,19 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
 	return items, nil
 }
 
+const getNextFeedToFetch = `-- name: GetNextFeedToFetch :one
+SELECT url FROM feeds
+ORDER BY updated_at ASC NULLS FIRST 
+LIMIT 1
+`
+
+func (q *Queries) GetNextFeedToFetch(ctx context.Context) (string, error) {
+	row := q.db.QueryRowContext(ctx, getNextFeedToFetch)
+	var url string
+	err := row.Scan(&url)
+	return url, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, created_at, updated_at, name FROM users
 WHERE name = $1

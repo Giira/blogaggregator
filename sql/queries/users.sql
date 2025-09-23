@@ -82,3 +82,8 @@ SET
     updated_at = $1
 WHERE 
     id = $2;
+
+-- name: GetNextFeedToFetch :one
+SELECT url FROM feeds
+ORDER BY updated_at ASC NULLS FIRST 
+LIMIT 1;
