@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Giira/blogaggregator/internal/database"
+	"github.com/google/uuid"
 )
 
 type RSSFeed struct {
@@ -81,19 +82,27 @@ func scrapeFeeds(s *state) error {
 		return fmt.Errorf("error: %v", err)
 	}
 
-	title := html.UnescapeString(feed.Channel.Title)
-	fmt.Printf("Title: %v\n", title)
-	fmt.Printf("Link: %v\n", feed.Channel.Link)
-	desc := html.UnescapeString(feed.Channel.Description)
-	fmt.Printf("Description: %v\n", desc)
-	for i, item := range feed.Channel.Item {
-		fmt.Printf("\nItem %v:\n\n", i+1)
-		title = html.UnescapeString(item.Title)
-		fmt.Printf("Title: %v\n", title)
-		fmt.Printf("Link: %v\n", item.Link)
-		desc = html.UnescapeString(item.Description)
-		fmt.Printf("Description: %v\n", desc)
-		fmt.Printf("Publication Date: %v\n", item.PubDate)
+	for _, item := range feed.Channel.Item {
+		t, err := time.Parse("Mon, 02 Jan 2006 15:04:05 -0700", item.PubDate)
+		if err != nil {
+			return fmt.Errorf("error converting time: %v", err)
+		}
+		_, err = s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Title:     html.UnescapeString(item.Title),
+			Url:       item.Link,
+			Description: sql.NullString{
+				String: html.UnescapeString(item.Description),
+				Valid:  true,
+			},
+			PublishedAt: t,
+			FeedID:      feed_details.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("error creating post: %v", err)
+		}
 	}
 	return nil
 }

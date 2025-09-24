@@ -1,4 +1,4 @@
---name CreatePost :one
+-- name: CreatePost :one
 INSERT INTO posts (id, created_at, updated_at, title, url, description, published_at, feed_id)
 VALUES (
     $1,
@@ -11,3 +11,8 @@ VALUES (
     $8
 )
 RETURNING *;
+
+-- name: GetPostsForUser :many
+SELECT * from posts
+ORDER BY published_at DESC
+LIMIT $1;

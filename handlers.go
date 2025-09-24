@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Giira/blogaggregator/internal/database"
@@ -197,6 +198,31 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 	})
 	if err != nil {
 		return fmt.Errorf("error: %v", err)
+	}
+	return nil
+}
+
+func handlerBrowse(s *state, cmd command) error {
+	limit := 2
+	if len(cmd.arguments) > 1 {
+		return errors.New("browse command takes an optional limit parameter")
+	} else if len(cmd.arguments) == 0 {
+		limit = 2
+	} else {
+		parsedLimit, err := strconv.Atoi(cmd.arguments[0])
+		if err != nil {
+			return fmt.Errorf("error: invalid limit parameter: %v", err)
+		}
+		limit = parsedLimit
+	}
+
+	posts, err := s.db.GetPostsForUser(context.Background(), int32(limit))
+	if err != nil {
+		return fmt.Errorf("error: %v", err)
+	}
+	for _, post := range posts {
+		fmt.Print(post.Title)
+		fmt.Print(post.Description.String)
 	}
 	return nil
 }
