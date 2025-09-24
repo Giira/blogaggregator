@@ -78,13 +78,20 @@ func handlerUsers(s *state, cmd command) error {
 }
 
 func handlerAgg(s *state, cmd command) error {
-	feedURL := "https://www.wagslane.dev/index.xml"
-	feed, err := fetchFeed(context.Background(), feedURL)
+	if len(cmd.arguments) != 1 {
+		return errors.New("agg command takes a single duration string")
+	}
+	t, err := time.ParseDuration(cmd.arguments[0])
 	if err != nil {
 		return fmt.Errorf("error: %v", err)
 	}
+	timeBetweenRequests := t
+	// feedURL := "https://www.wagslane.dev/index.xml"
 
-	return nil
+	ticker := time.NewTicker(timeBetweenRequests)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
 }
 
 func handlerAddfeed(s *state, cmd command, user database.User) error {
