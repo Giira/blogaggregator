@@ -221,8 +221,9 @@ func handlerBrowse(s *state, cmd command) error {
 		return fmt.Errorf("error: %v", err)
 	}
 	for _, post := range posts {
-		fmt.Print(post.Title)
-		fmt.Print(post.Description.String)
+		fmt.Println(post.Title)
+		fmt.Println(post.Description.String)
+		fmt.Println(post.PublishedAt)
 	}
 	return nil
 }
