@@ -38,20 +38,21 @@ go build
 ## Usage
 ### Users
 ```
-. register <username>   # Create new user
-. login <username>      # Login as user
-. users                 # List registered users
-. reset                 # Delete all users
+./blogaggregator register <username>   # Create new user
+./blogaggregator login <username>      # Login as user
+./blogaggregator users                 # List registered users
+./blogaggregator reset                 # Delete all users
 ```
 ### Feeds
 ```
-. addfeed <name> <url>  # Add new RSS feed
-. feeds                 # List feeds in database
-. follow <url>          # Follow a feed as logged in user
-. unfollow <url>        # Unfollow a feed
-. following             # List logged in users followed feeds
+./blogaggregator addfeed <name> <url>  # Add new RSS feed
+./blogaggregator feeds                 # List feeds in database
+./blogaggregator follow <url>          # Follow a feed as logged in user
+./blogaggregator unfollow <url>        # Unfollow a feed
+./blogaggregator following             # List logged in users followed feeds
 ```
 ### Functions
 ```
-. browse [n]            # Show n latest posts - default 2
-. agg <interval>        # Aggregate feeds - Make interval long enough to avoid DOSing feeds
+./blogaggregator browse [n]            # Show n latest posts - default 2
+./blogaggregator agg <interval>        # Aggregate feeds - Make interval long enough to avoid DOSing feeds
+```
